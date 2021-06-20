@@ -3,9 +3,11 @@ package cn.iwgang.countdownviewdemo;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import cn.iwgang.countdownview.CountdownView;
 

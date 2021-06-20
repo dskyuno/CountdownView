@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -22,6 +23,7 @@ public class CountdownView extends View {
     private long mPreviousIntervalCallbackTime;
     private long mInterval;
     private long mRemainTime;
+    private Boolean isCountDown;
 
     public CountdownView(Context context) {
         this(context, null);
@@ -127,6 +129,46 @@ public class CountdownView extends View {
         mCustomCountDownTimer = new CustomCountDownTimer(millisecond, countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
+                updateShow(millisUntilFinished);
+            }
+
+            @Override
+            public void onFinish() {
+                // countdown end
+                allShowZero();
+                // callback
+                if (null != mOnCountdownEndListener) {
+                    mOnCountdownEndListener.onEnd(CountdownView.this);
+                }
+            }
+        };
+        mCustomCountDownTimer.start();
+    }
+
+
+    public void start(long millisecond,Boolean isCountDown) {
+        this.isCountDown =isCountDown;
+        if (millisecond <= 0) return;
+
+        mPreviousIntervalCallbackTime = 0;
+
+        if (null != mCustomCountDownTimer) {
+            mCustomCountDownTimer.stop();
+            mCustomCountDownTimer = null;
+        }
+
+        long countDownInterval;
+        if (mCountdown.isShowMillisecond) {
+            countDownInterval = 10;
+            updateShow(millisecond);
+        } else {
+            countDownInterval = 1000;
+        }
+
+        mCustomCountDownTimer = new CustomCountDownTimer(millisecond, countDownInterval) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.e("更新","dssddad");
                 updateShow(millisUntilFinished);
             }
 

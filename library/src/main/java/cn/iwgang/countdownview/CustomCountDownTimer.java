@@ -3,6 +3,7 @@ package cn.iwgang.countdownview;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.util.Log;
 
 /**
  * 使用android.os.CountDownTimer的源码
@@ -19,6 +20,7 @@ public abstract class CustomCountDownTimer {
     private long mPauseTimeInFuture;
     private boolean isStop = false;
     private boolean isPause = false;
+    private boolean isCountDown = true;
 
     /**
      * @param millisInFuture    总倒计时时间
@@ -37,8 +39,23 @@ public abstract class CustomCountDownTimer {
             onFinish();
             return this;
         }
-        mStopTimeInFuture = SystemClock.elapsedRealtime() + millisInFuture;
-        mHandler.sendMessage(mHandler.obtainMessage(MSG));
+        if (isCountDown) {
+            mStopTimeInFuture = SystemClock.elapsedRealtime() + millisInFuture;
+            mHandler.sendMessage(mHandler.obtainMessage(MSG));
+        } else {
+            AlreadyTime alreadyTime = new AlreadyTime(millisInFuture, 1000);
+            alreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
+                @Override
+                public void onAlreadyTime(Long mills) {
+                    //  Log.e("正计时", "" + mills / 1000 + "秒");
+                    onTick(mills);
+                }
+            });
+            alreadyTime.start();
+
+        }
+
+
         return this;
     }
 
@@ -47,6 +64,15 @@ public abstract class CustomCountDownTimer {
      */
     public synchronized final void start() {
         start(mMillisInFuture);
+    }
+
+    /**
+     * 开始倒计时
+     */
+    public synchronized final void start(Boolean isCountDown) {
+        this.isCountDown = isCountDown;
+        start(mMillisInFuture);
+
     }
 
     /**
@@ -62,7 +88,7 @@ public abstract class CustomCountDownTimer {
      * 调用{@link #restart()}方法重新开始
      */
     public synchronized final void pause() {
-        if (isStop) return ;
+        if (isStop) return;
 
         isPause = true;
         mPauseTimeInFuture = mStopTimeInFuture - SystemClock.elapsedRealtime();
@@ -73,7 +99,7 @@ public abstract class CustomCountDownTimer {
      * 重新开始
      */
     public synchronized final void restart() {
-        if (isStop || !isPause) return ;
+        if (isStop || !isPause) return;
 
         isPause = false;
         start(mPauseTimeInFuture);
@@ -81,6 +107,7 @@ public abstract class CustomCountDownTimer {
 
     /**
      * 倒计时间隔回调
+     *
      * @param millisUntilFinished 剩余毫秒数
      */
     public abstract void onTick(long millisUntilFinished);
@@ -103,7 +130,17 @@ public abstract class CustomCountDownTimer {
 
                 final long millisLeft = mStopTimeInFuture - SystemClock.elapsedRealtime();
                 if (millisLeft <= 0) {
-                    onFinish();
+                    // Log.e("正计时", "" + millisLeft+ "秒");
+                    //onFinish();
+                    AlreadyTime alreadyTime = new AlreadyTime(0, 1000);
+                    alreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
+                        @Override
+                        public void onAlreadyTime(Long mills) {
+                            //  Log.e("正计时", "" + mills / 1000 + "秒");
+                            onTick(mills);
+                        }
+                    });
+                    alreadyTime.start();
                 } else {
                     long lastTickStart = SystemClock.elapsedRealtime();
                     onTick(millisLeft);
