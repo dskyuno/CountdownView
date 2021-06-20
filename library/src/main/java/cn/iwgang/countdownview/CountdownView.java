@@ -142,7 +142,7 @@ public class CountdownView extends View {
                 }
             }
         };
-        mCustomCountDownTimer.start(isCountDown);
+        mCustomCountDownTimer.start();
     }
 
 
@@ -182,7 +182,7 @@ public class CountdownView extends View {
                 }
             }
         };
-        mCustomCountDownTimer.start();
+        mCustomCountDownTimer.start(isCountDown);
     }
 
     /**
