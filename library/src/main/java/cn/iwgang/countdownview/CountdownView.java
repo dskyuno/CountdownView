@@ -142,7 +142,7 @@ public class CountdownView extends View {
                 }
             }
         };
-        mCustomCountDownTimer.start();
+        mCustomCountDownTimer.start(isCountDown);
     }
 
 
