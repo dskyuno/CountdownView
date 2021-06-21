@@ -21,6 +21,7 @@ public abstract class CustomCountDownTimer {
     private boolean isStop = false;
     private boolean isPause = false;
     private boolean isCountDown = true;
+    private AlreadyTime mAlreadyTime;
 
     /**
      * @param millisInFuture    总倒计时时间
@@ -43,15 +44,15 @@ public abstract class CustomCountDownTimer {
             mStopTimeInFuture = SystemClock.elapsedRealtime() + millisInFuture;
             mHandler.sendMessage(mHandler.obtainMessage(MSG));
         } else {
-            AlreadyTime alreadyTime = new AlreadyTime(millisInFuture, 1000);
-            alreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
+            mAlreadyTime = new AlreadyTime(millisInFuture, 1000);
+            mAlreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
                 @Override
                 public void onAlreadyTime(Long mills) {
                     //  Log.e("正计时", "" + mills / 1000 + "秒");
                     onTick(mills);
                 }
             });
-            alreadyTime.start();
+            mAlreadyTime.start();
 
         }
 
@@ -81,6 +82,7 @@ public abstract class CustomCountDownTimer {
     public synchronized final void stop() {
         isStop = true;
         mHandler.removeMessages(MSG);
+        mAlreadyTime.stop();
     }
 
     /**
@@ -132,15 +134,15 @@ public abstract class CustomCountDownTimer {
                 if (millisLeft <= 0) {
                     // Log.e("正计时", "" + millisLeft+ "秒");
                     //onFinish();
-                    AlreadyTime alreadyTime = new AlreadyTime(0, 1000);
-                    alreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
+                    mAlreadyTime = new AlreadyTime(0, 1000);
+                    mAlreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
                         @Override
                         public void onAlreadyTime(Long mills) {
                             //  Log.e("正计时", "" + mills / 1000 + "秒");
                             onTick(mills);
                         }
                     });
-                    alreadyTime.start();
+                    mAlreadyTime.start();
                 } else {
                     long lastTickStart = SystemClock.elapsedRealtime();
                     onTick(millisLeft);
