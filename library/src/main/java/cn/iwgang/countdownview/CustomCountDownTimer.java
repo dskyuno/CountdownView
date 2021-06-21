@@ -82,7 +82,7 @@ public abstract class CustomCountDownTimer {
     public synchronized final void stop() {
         isStop = true;
         mHandler.removeMessages(MSG);
-        mAlreadyTime.stop();
+        if(mAlreadyTime!=null)mAlreadyTime.stop();
     }
 
     /**
