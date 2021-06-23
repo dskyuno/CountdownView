@@ -168,7 +168,6 @@ public class CountdownView extends View {
         mCustomCountDownTimer = new CustomCountDownTimer(millisecond, countDownInterval) {
             @Override
             public void onTick(long millisUntilFinished) {
-                Log.e("更新","dssddad");
                 updateShow(millisUntilFinished);
             }
 
