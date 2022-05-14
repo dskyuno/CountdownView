@@ -3,7 +3,6 @@ package cn.iwgang.countdownview;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.util.Log;
 
 /**
  * 使用android.os.CountDownTimer的源码
@@ -49,7 +48,7 @@ public abstract class CustomCountDownTimer {
                 @Override
                 public void onAlreadyTime(Long mills) {
                     //  Log.e("正计时", "" + mills / 1000 + "秒");
-                    onTick(mills);
+                    onTick(mills,true);
                 }
             });
             mAlreadyTime.start();
@@ -112,7 +111,7 @@ public abstract class CustomCountDownTimer {
      *
      * @param millisUntilFinished 剩余毫秒数
      */
-    public abstract void onTick(long millisUntilFinished);
+    public abstract void onTick(long millisUntilFinished,boolean isAlready);
 
     /**
      * 倒计时结束回调
@@ -132,28 +131,19 @@ public abstract class CustomCountDownTimer {
 
                 final long millisLeft = mStopTimeInFuture - SystemClock.elapsedRealtime();
                 if (millisLeft <= 0) {
-                    // Log.e("正计时", "" + millisLeft+ "秒");
-                    //onFinish();
                     mAlreadyTime = new AlreadyTime(0, 1000);
                     mAlreadyTime.setOnAlreadyTimeListener(new AlreadyTime.OnAlreadyTimeListener() {
                         @Override
                         public void onAlreadyTime(Long mills) {
-                            //  Log.e("正计时", "" + mills / 1000 + "秒");
-                            onTick(mills);
+                            onTick(mills,true);
                         }
                     });
                     mAlreadyTime.start();
                 } else {
                     long lastTickStart = SystemClock.elapsedRealtime();
-                    onTick(millisLeft);
-
-                    // take into account user's onTick taking time to execute
+                    onTick(millisLeft,false);
                     long delay = lastTickStart + mCountdownInterval - SystemClock.elapsedRealtime();
-
-                    // special case: user's onTick took more than interval to
-                    // complete, skip to next interval
                     while (delay < 0) delay += mCountdownInterval;
-
                     sendMessageDelayed(obtainMessage(MSG), delay);
                 }
             }
